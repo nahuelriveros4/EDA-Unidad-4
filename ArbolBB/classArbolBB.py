@@ -48,48 +48,48 @@ class ABB:
         nodo_actual = self.raiz
         padre = None
         while nodo_actual is not None:
-            if x < nodo_actual.obtener_item(): 
+            if x < nodo_actual.obtener_item():
                 padre = nodo_actual
                 nodo_actual = nodo_actual.obtener_izq()
-            elif x > nodo_actual.obtener_item():  
+            elif x > nodo_actual.obtener_item():
                 padre = nodo_actual
                 nodo_actual = nodo_actual.obtener_der()
             else:
+                # Nodo encontrado: Clave[X] = Clave[R]
                 if nodo_actual.obtener_izq() is None and nodo_actual.obtener_der() is None:
-                    if padre is None:  
+                # Grado(R) = 0 -> Eliminar nodo sin hijos
+                    if padre is None:  # Si es la raíz
                         self.raiz = None
                     elif padre.obtener_izq() == nodo_actual:
                         padre.cargar_izq(None)
                     else:
                         padre.cargar_der(None)
-                elif nodo_actual.obtener_izq() is None: 
-                    if padre is None:  
-                        self.raiz = nodo_actual.obtener_der()
+                elif nodo_actual.obtener_izq() is None or nodo_actual.obtener_der() is None:
+                    # Grado(R) = 1 -> Padre(R) ← Hijo(R)
+                    hijo = nodo_actual.obtener_izq() if nodo_actual.obtener_izq() else nodo_actual.obtener_der()
+                    if padre is None:  # Si es la raíz
+                        self.raiz = hijo
                     elif padre.obtener_izq() == nodo_actual:
-                        padre.cargar_izq(nodo_actual.obtener_der())
+                        padre.cargar_izq(hijo)
                     else:
-                        padre.cargar_der(nodo_actual.obtener_der())
-                
-                elif nodo_actual.obtener_der() is None: 
-                    if padre is None:  
-                        self.raiz = nodo_actual.obtener_izq()
-                    elif padre.obtener_izq() == nodo_actual:
-                        padre.cargar_izq(nodo_actual.obtener_izq())
-                    else:
-                        padre.cargar_der(nodo_actual.obtener_izq())
+                        padre.cargar_der(hijo)
                 else:
-                    sucesor = nodo_actual.obtener_der()
+                    # Grado(R) = 2 -> R ← Máximo del subárbol izquierdo
                     sucesor_padre = nodo_actual
-                    while sucesor.obtener_izq() is not None: 
+                    sucesor = nodo_actual.obtener_izq()
+                    while sucesor.obtener_der() is not None:
                         sucesor_padre = sucesor
-                        sucesor = sucesor.obtener_izq()
+                        sucesor = sucesor.obtener_der()
+                    # Reemplazar el valor de R por el máximo del subárbol izquierdo
                     nodo_actual.cargaritem(sucesor.obtener_item())
-                    if sucesor_padre.obtener_izq() == sucesor: 
-                        sucesor_padre.cargar_izq(sucesor.obtener_der())
-                    else:  
-                        sucesor_padre.cargar_der(sucesor.obtener_der())
+                    # Eliminar el sucesor del subárbol izquierdo
+                    if sucesor_padre == nodo_actual:
+                        sucesor_padre.cargar_izq(sucesor.obtener_izq())
+                    else:
+                        sucesor_padre.cargar_der(sucesor.obtener_izq())
                 return  # Elemento eliminado
         raise ValueError(f"Error: Elemento {x} inexistente.")
+
 
     # Calcular el nivel del nodo con clave X
     def nivel(self, x):
