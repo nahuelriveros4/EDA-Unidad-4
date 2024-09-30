@@ -126,6 +126,8 @@ class ABB:
     def camino(self, x, z):
         nodo_x = self.buscar(x)
         nodo_z = self.buscar(z)
+        if nodo_x is None or nodo_z is None:
+            raise ValueError(f"Uno o ambos nodos ({x}, {z}) no existen en el árbol.")
         camino = []
         nodo_actual = self.raiz
         while nodo_actual is not None:
@@ -151,7 +153,6 @@ class ABB:
                 max_altura = max(max_altura, altura_actual)
                 stack.append((nodo.obtener_izq(), altura_actual + 1))
                 stack.append((nodo.obtener_der(), altura_actual + 1))
-
         return max_altura
 
     def preorden(self):
